@@ -1,0 +1,32 @@
+---
+title: "disease-surveillance-workshop"
+---
+
+Contains all material for the disease surveillance workshops, including code and data.
+
+## How to download
+
+### 1. Follow the link
+
+Simply click on [this link](https://github.com/siobhon-egan/disease-surveillance-workshop/archive/refs/heads/master.zip) to download a zipped file and unzip.
+
+### 2. Download in your brower from github
+
+https://github.com/siobhon-egan/disease-surveillance-workshop
+
+Click on the green `code` button and click `Download ZIP`.
+Unzip file on your computer.
+
+### 3. From the terminal
+
+```bash
+git clone https://github.com/siobhon-egan/disease-surveillance-workshop
+```
+
+
+## How to use
+
+Open the `disease-surveillance-workshop.Rproj` file and it will open a new session in RStudio.
+
+To follow along simply open the lesson file e.g. `mapping.qmd` and you can execute the commands.
+All relevent data is stored in the `data` directory.
