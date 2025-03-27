@@ -4,6 +4,8 @@ title: "disease-surveillance-workshop"
 
 Contains all material for the disease surveillance workshops, including code and data.
 
+https://siobhonlegan.com/disease-surveillance-workshop
+
 ## How to download
 
 ### 1. Follow the link
