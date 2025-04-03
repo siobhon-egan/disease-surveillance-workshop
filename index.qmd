@@ -1,18 +1,18 @@
 ---
-title: "disease-surveillance-workshop"
+title: "Disease Surveillance Workshop"
 ---
 
-Contains all material for the disease surveillance workshops, including code and data.
+To follow along with the workshops the easiest way to download all the code and data is via the github repository available at https://github.com/siobhon-egan/disease-surveillance-workshop. Below are some options on how to download.
 
-https://siobhonlegan.com/disease-surveillance-workshop
+View the content online at the website https://siobhonlegan.com/disease-surveillance-workshop
 
-## How to download
+## Options for download
 
 ### 1. Follow the link
 
 Simply click on [this link](https://github.com/siobhon-egan/disease-surveillance-workshop/archive/refs/heads/master.zip) to download a zipped file and unzip.
 
-### 2. Download in your brower from github
+### 2. Download in your browser
 
 https://github.com/siobhon-egan/disease-surveillance-workshop
 
@@ -28,7 +28,42 @@ git clone https://github.com/siobhon-egan/disease-surveillance-workshop
 
 ## How to use
 
-Open the `disease-surveillance-workshop.Rproj` file and it will open a new session in RStudio.
+If you want to follow along an execute the commands to reproduce on your local computer the easiest way it to open the `disease-surveillance-workshop.Rproj` file and it will open a new session in RStudio.
 
-To follow along simply open the lesson file e.g. `mapping.qmd` and you can execute the commands.
-All relevent data is stored in the `data` directory.
+Simply open the lesson file e.g. `mapping.qmd` and you can execute the commands.
+
+### Data 
+
+Assuming you have downloaded the entire repository all the relevant data is stored in the **data/** directory. 
+
+::: {.callout-note}
+
+To allow non-R users to follow along some datasets are also saved as a `.csv` file for you to open in excel.
+
+:::
+
+
+### Packages for R
+
+You will need to install the package pacman the first time run you run this. You can do this by executing the chunk below. Using `p_load` command from the `pacman` package makes it easier to load/install libraries.
+```{r}
+#| eval: false
+#| include: false
+install.packages("pacman")
+```
+
+Then at the start of each lesson is a function to install/load packages using the `p_load()` command (explained below).
+
+::: {.callout-note appearance="simple" collapse=true}
+
+#### The `p_load()` function
+
+A handy way to load packages the function checks if the package is installed, if not it attempts to install the package from CRAN and/or any other repository in the pacman repository list.
+
+:::
+
+
+### R version
+
+This workshop was built using `R version 4.3.1 (2023-06-16)` and RStudio `2024.12.1+563 (2024.12.1+563)`.
+

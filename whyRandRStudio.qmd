@@ -1,0 +1,23 @@
+---
+title: "Why use R and R Studio"
+---
+
+The exemplar topics are designed to give you a taste of the power behind R and RStudio.
+
+There is no `one-size-fits-all` solution when it comes to data analysis, software, coding and communicating your results.
+
+No doubt in your day-to-day work you will be interfacing with a number of different systems, applications and software.
+
+But deciding which programs to learn can be daunting. 
+
+If you can use one program to perform multiple tasks that saves that seems like a win!
+
+These examples are designed to give you a taste of the power behind R and why it can potentially replace you having to learn multiple different programs and applications.
+
+We all know how frustrating it can be when you have to re-learn a program because you haven't used it in a while. 
+
+Like with anything the more you can use it regularly the better you will become.
+
+But performing as much you can in R/RStudio and using it often you will quickly improve your skills and learning something new within R/RStudio will be become easier.
+
+See the [resources](resources.qmd) page for some useful links.

@@ -1,0 +1,25 @@
+---
+title: "Data"
+---
+
+The data output from the laboratory assays is complex.
+
+Here is a common example of information from patient sampling that you might end up with
+Sometimes this
+
+1. Patient demographic data
+2. Patient survey
+3. Sample information
+4. Processed results for sample from laboratory assays
+
+
+You may also need to consider you have
+
+- Multiple samples collected from the same person
+- Multiple sampling timepoints - 
+- Various nuances in analysing the laboratory data - not all of the following will apply to all assays and nomenclature varies alot!
+    - Positive controls - this may be in the form of a sample with pathogen present
+    - Negative controls - may be in the form of a sample with pathogen present, or maybe a 
+    - Blank control - used for analytical purposes to ensure no 'back ground' interference 
+    - Reference samples
+    - Long-term reference samples - ensure stability of assays being performed,

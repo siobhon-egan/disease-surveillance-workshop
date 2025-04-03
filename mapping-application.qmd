@@ -1,0 +1,211 @@
+---
+title: "Local examples"
+---
+
+
+I am assuming you want more mapping after [the first exercise](mapping-introduction.qmd) so lets explore some local examples that you can get started with!
+
+<!-- ======================================================= -->
+
+## Preparation {  }
+
+### Load packages {.unnumbered} 
+
+Load packages is using the `p_load` command
+
+```{r}
+pacman::p_load(
+  rio,           # to import data
+  tidyverse,     # to clean, handle, and plot the data (includes ggplot2 package)
+  OpenStreetMap, # to add OSM basemap in ggplot map
+  sf,            # to manage spatial data using a Simple Feature format
+  rear,          # read in csv file
+  tmap          # to produce simple maps, works for both interactive and static maps
+  )
+```
+
+In order to reproduce the previous mapping exercise we need two bits of data:
+
+1. Shape file - it was already downloaded for you in the directory **data/sle_adm3**. 
+2. Metadata (in the form of a spreadsheet) for the samples/patients. Importantly this had a column for latitude and longitude coordinates in the format `8.462472`, `-13.26216` (stored in separate columns)
+
+There are a few options we can explore if you don't have an appropriate shape file.
+
+Again let's just read in the linelist dataset
+```{r}
+# import clean case linelist
+linelist <- import("data/linelist_cleaned.rds")  
+```
+
+<!-- ======================================================= -->
+## Using OpenStreetMap {  }
+
+[**OpenStreetMap**](https://en.wikipedia.org/wiki/OpenStreetMap) is a collaborative project to create a free editable map of the world. The underlying geolocation data (e.g. locations of cities, roads, natural features, airports, schools, hospitals, roads etc) are considered the primary output of the project.
+
+First we load the **OpenStreetMap** package, from which we will get our basemap.  
+
+Then, we create the object `map`, which we define using the function `openmap()` from **OpenStreetMap** package ([documentation](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/openmap)). We provide the following:  
+
+* `upperLeft` and `lowerRight` Two coordinate pairs specifying the limits of the basemap tile  
+  * In this case we've put in the max and min from the linelist rows, so the map will respond dynamically to the data  
+* `zoom = ` (if null it is determined automatically)  
+* `type =` which type of basemap - we have listed several possibilities here and the code is currently using the first one (`[1]`) "osm"  
+* `mergeTiles = ` we chose TRUE so the basetiles are all merged into one
+
+```{r}
+# Fit basemap by range of lat/long coordinates. Choose tile type
+map <- OpenStreetMap::openmap(
+  upperLeft = c(max(linelist$lat, na.rm=T), max(linelist$lon, na.rm=T)),   # limits of basemap tile
+  lowerRight = c(min(linelist$lat, na.rm=T), min(linelist$lon, na.rm=T)),
+  zoom = NULL,
+  type = c("osm", "stamen-toner", "stamen-terrain", "stamen-watercolor", "esri","esri-topo")[1])
+```
+
+If we plot this basemap right now, using `autoplot.OpenStreetMap()` from **OpenStreetMap** package, you see that the units on the axes are not latitude/longitude coordinates. It is using a different coordinate system. To correctly display the case residences (which are stored in lat/long), this must be changed.  
+
+
+```{r}
+autoplot.OpenStreetMap(map)
+```
+Thus, we want to convert the map to latitude/longitude with the `openproj()` function from **OpenStreetMap** package. We provide the basemap `map` and also provide the Coordinate Reference System (CRS) we want. We do this by providing the "proj.4" character string for the WGS 1984 projection, but you can provide the CRS in other ways as well. (see [this page](https://www.earthdatascience.org/courses/earth-analytics/spatial-data-r/understand-epsg-wkt-and-other-crs-definition-file-types/) to better understand what a proj.4 string is)  
+
+```{r}
+# Projection WGS84
+map_latlon <- openproj(map, projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+```
+
+Now when we create the plot we see that along the axes are latitude and longitude coordinate. The coordinate system has been converted. Now our cases will plot correctly if overlaid!  
+
+```{r}
+# Plot map. Must use "autoplot" in order to work with ggplot
+autoplot.OpenStreetMap(map_latlon)
+```
+
+See the tutorials [here](http://data-analytics.net/cep/Schedule_files/geospatial.html) and [here](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/autoplot.OpenStreetMap) for more info.  
+
+When we have a basemap with lat/long coordinates, we can plot our cases on top using the lat/long coordinates of their residence. 
+
+Building on the function `autoplot.OpenStreetMap()` to create the basemap, **ggplot2** functions will easily add on top, as shown with `geom_point()` below:  
+
+```{r, warning=F, message=F}
+# Plot map. Must be autoplotted to work with ggplot
+autoplot.OpenStreetMap(map_latlon)+                 # begin with the basemap
+  geom_point(                                       # add xy points from linelist lon and lat columns 
+    data = linelist,                                
+    aes(x = lon, y = lat),
+    size = 1, 
+    alpha = 0.5,
+    show.legend = FALSE) +                          # drop legend entirely
+  labs(x = "Longitude",                             # titles & labels
+       y = "Latitude",
+       title = "Cumulative cases")
+
+```
+
+
+## Let's try with own example now {  }
+
+I download mosquito occurrence data from the [iNaturalist site](https://www.inaturalist.org/home) - searching for any Culicidae occurances in Sarawak. You can load it in as the csv file is saved in the **data/iNat-mosquito-obs** directory
+```{r}
+mosqutio <- read_csv("data/iNat-mosquito-obs/observations-545115.csv")
+```
+
+```{r}
+# Fit basemap by range of lat/long coordinates. Choose tile type
+map <- OpenStreetMap::openmap(
+  upperLeft = c(max(mosqutio$latitude, na.rm=T), max(mosqutio$longitude, na.rm=T)),   # limits of basemap tile
+  lowerRight = c(min(mosqutio$latitude, na.rm=T), min(mosqutio$longitude, na.rm=T)),
+  zoom = NULL,
+  type = c("osm", "stamen-toner", "stamen-terrain", "stamen-watercolor", "esri","esri-topo")[1])
+
+# Projection WGS84
+map_latlon <- openproj(map, projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+```
+
+```{r}
+# Plot map. Must use "autoplot" in order to work with ggplot
+autoplot.OpenStreetMap(map_latlon)
+```
+
+
+As per previous we can now plot our observation points on the map
+
+```{r, warning=F, message=F}
+# Plot map. Must be autoplotted to work with ggplot
+autoplot.OpenStreetMap(map_latlon) +                 # begin with the basemap
+  geom_point(                                       # add xy points from linelist lon and lat columns 
+    data = mosqutio,                                
+    aes(x = longitude, y = latitude),
+    size = 1, 
+    alpha = 0.5,
+    show.legend = FALSE) +                          # drop legend entirely
+  labs(x = "Longitude",                             # titles & labels
+       y = "Latitude",
+       title = "Mosquito Occurence Data Sarawak")
+
+```
+
+
+
+<!-- ======================================================= -->
+## Using the sf package {  }
+
+A google search for Malaysia Shapefile lead me to [this resource](https://simplemaps.com/gis/country/my#admin1) which contains shape file for the states in Malaysia.
+
+```{r}
+my = read_sf("data/my_shp/my.shp")
+
+tm_shape(my) +               # admin boundaries shapefile
+  tm_polygons(col = "name")+    # show polygons in light grey
+  tm_borders(col = "red",      # show borders with color and line weight
+             lwd = 2) +
+  tm_text("name") 
+
+```
+
+
+Including an interactive view using `tmap_mode("view")`
+```{r}
+tmap_mode("view")
+tm_shape(my) +               # admin boundaries shapefile
+  tm_polygons(col = "#F7F7F7")+    # show polygons in light grey
+  tm_borders(col = "#000000",      # show borders with color and line weight
+             lwd = 2) +
+  tm_text("name") 
+```
+
+We can also plot using **ggplot2** package
+
+```{r}
+ggplot(data=my) + 
+  geom_sf(aes(fill=name))
+```
+
+
+
+## Adding in those mosquito occurance records to our tmap{  }
+
+Covert the "mosquito" dataframe to a sf with function `st_as_sf()` to create the new object we call mosqutio_sf. This designated the columns longitude and latitude as coordinate columns, and a coordinate reference system (CRS) has been assigned for when the points are displayed.
+
+```{r}
+# Create sf object
+mosqutio_sf <- mosqutio %>%
+     sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+```
+
+Now we overlay our occurrence data over the interactive tmap
+
+```{r}
+tmap_mode("view")
+tm_shape(my[6,]) +               # admin boundaries shapefile
+  tm_polygons(col = "#F7F7F7")+    # show polygons in light grey
+  tm_borders(col = "#000000",      # show borders with color and line weight
+             lwd = 2) +
+  tm_text("name") +
+tm_shape(mosqutio_sf) +
+  tm_dots(size=0.08, col='purple', alpha = 1) +
+  tm_layout(title = "Mosquito Occurence Data Sarawak") 
+```
+
+
+

@@ -1,0 +1,25 @@
+---
+title: "Resouces"
+---
+
+Some recommended resources - one of the huge benefits of R is the open source community and its documentation. Some suggested places to start are included below.
+
+**Epidemiology**
+
+- [The R Epidemics Consortium (RECON)](https://www.repidemicsconsortium.org/) is an international not-for-profit, non-governmental organisation gathering experts in data science, modelling methodology, public health, and software development to create the next generation of analytics tools for informing the response to disease outbreaks, health emergencies and humanitarian crises, using the R software and other free, open-source resources
+
+- [Applied Epi](https://appliedepi.org/) was created by and for epidemiologists to improve public health practice worldwide, particularly in low-resource settings. Our 100 team members are R experts with experience fighting outbreaks and building public health data systems.
+    - [The Epidemiologist R Handbook](https://epirhandbook.com/en/)
+
+- [Epiverse-TRACE](https://github.com/epiverse-trace) part of the Epiverse project, and is helping to grow an ecosystem for global infectious disease analysis and response. From reading and cleaning your data to estimating vaccine efficacy and policy impact, Epiverse-TRACE aims to make common tasks easier and faster so you can focus on the results.
+
+- [r4epi](https://www.r4epi.com/) an introduction to R Programming for Epidemiologic Research course at the University of Texas Health Science Center School of Public Health. However, I hope it will be useful to anyone who is interested in R and epidemiology.
+
+**Genomics**
+
+- [Computational Genomics with R](https://compgenomr.github.io/)
+
+**General R and related data resources**
+
+- [R for Data Science (2e)](https://r4ds.hadley.nz/) - This book will teach you how to do data science with R: You’ll learn how to get your data into R, get it into the most useful structure, transform it and visualize.
+- [The Carpentries]()

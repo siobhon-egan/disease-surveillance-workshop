@@ -1,23 +1,32 @@
 project:
-  type: website
+  type: book
   output-dir: docs
 
-website:
-  title: "disease-surveillance-workshop"
-  sidebar:
-    style: "docked"
-    search: true
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - mapping.qmd
+book:
+  title: "Disease Surveillance Workshop"
+  search: true
+  site-url: https://siobhonlegan.com/disease-surveillance-workshop/
+  chapters:
+    - index.qmd
+    - part: "Introduction"
+      chapters:
+        - whyRandRStudio.qmd
+    - part: "Working with multiple datasets"
+      chapters:
+        - merging-data-introduction.qmd
+        - merging-data-application.qmd
+    - part: "Mapping"
+      chapters:
+        - mapping-introduction.qmd
+        - mapping-application.qmd
+    - part: "Resources"
+      chapters:
+        - resources.qmd
 
 format:
   html:
-    theme: minty
-    css: styles.css
-    toc: true
+    theme: [cosmo, custom.scss]
+    code-link: true
 
 
 
