@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./mapping-introduction.html" rel="next">
+<link href="./phylogenetics.html" rel="next">
 <link href="./merging-data-introduction.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -131,6 +131,16 @@ ul.task-list li input[type="checkbox"] {
   <a href="./merging-data-application.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./phylogenetics.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Phylogenetic trees</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./omicsIntegration.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Omics Integration</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -143,12 +153,12 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mapping-introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">GIS in R</span></a>
+  <a href="./mapping-introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Introduction to mapping R</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./mapping-application.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Local examples</span></a>
+  <a href="./mapping-application.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Local examples</span></a>
   </div>
 </li>
       </ul>
@@ -163,7 +173,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./resources.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Resouces</span></a>
+  <a href="./resources.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Resouces</span></a>
   </div>
 </li>
       </ul>
@@ -196,7 +206,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <p>The data output from the laboratory assays is complex.</p>
-<p>Here is a common example of information from patient sampling that you might end up with Sometimes this</p>
+<p>Here is a common example of information from patient sampling that you might end up with</p>
 <ol type="1">
 <li>Patient demographic data</li>
 <li>Patient survey</li>
@@ -206,16 +216,19 @@ ul.task-list li input[type="checkbox"] {
 <p>You may also need to consider you have</p>
 <ul>
 <li>Multiple samples collected from the same person</li>
-<li>Multiple sampling timepoints -</li>
+<li>Multiple sampling timepoints</li>
 <li>Various nuances in analysing the laboratory data - not all of the following will apply to all assays and nomenclature varies alot!
 <ul>
 <li>Positive controls - this may be in the form of a sample with pathogen present</li>
 <li>Negative controls - may be in the form of a sample with pathogen present, or maybe a</li>
 <li>Blank control - used for analytical purposes to ensure no ‘back ground’ interference</li>
 <li>Reference samples</li>
-<li>Long-term reference samples - ensure stability of assays being performed,</li>
+<li>Long-term reference samples - ensure stability of assays being performed</li>
 </ul></li>
 </ul>
+<p>Of course we can’t cover all of that so what we will look at is ways to merge our processed data with our patient metadata to get some meaningful interpretation and figures - hopefully it will also further convince you of the power behind R, especially as data sets get more complicated.</p>
+<p>Exercise 1 is <a href="./phylogenetics.html">phylogenetic data</a></p>
+<p>Exercise 2 is combining multi-omic data</p>
 
 
 
@@ -360,8 +373,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./mapping-introduction.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">GIS in R</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./phylogenetics.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Phylogenetic trees</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

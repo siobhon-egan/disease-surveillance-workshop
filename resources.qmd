@@ -15,6 +15,8 @@ Some recommended resources - one of the huge benefits of R is the open source co
 
 - [r4epi](https://www.r4epi.com/) an introduction to R Programming for Epidemiologic Research course at the University of Texas Health Science Center School of Public Health. However, I hope it will be useful to anyone who is interested in R and epidemiology.
 
+- [](https://www.reconlearn.org/)
+
 **Genomics**
 
 - [Computational Genomics with R](https://compgenomr.github.io/)
@@ -23,3 +25,13 @@ Some recommended resources - one of the huge benefits of R is the open source co
 
 - [R for Data Science (2e)](https://r4ds.hadley.nz/) - This book will teach you how to do data science with R: You’ll learn how to get your data into R, get it into the most useful structure, transform it and visualize.
 - [The Carpentries]()
+- [Data Science Box](https://datasciencebox.org/)
+- [RSudio Education](https://education.rstudio.com/learn/)
+
+
+**Misc. resources but written for Life/Medical Sciences Audience**
+
+- [Reproducible Medical Research with R Peter D.R. Higgins, MD, PhD, MSc](https://bookdown.org/pdr_higgins/rmrwr/)
+- [Introduction to R, databases and reproducibility for AMR Epidemiologists](https://github-pages.arc.ucl.ac.uk/r-amr-epidemiology/22-quarto.html)
+- [Cleaning Biodiversity Data in R
+](https://cleaning-data-r.ala.org.au/)

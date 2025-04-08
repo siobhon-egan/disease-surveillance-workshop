@@ -1,5 +1,5 @@
 ---
-title: "GIS in R"
+title: "Introduction to mapping R"
 ---
 
 ::: {.callout-note icon="false"}
@@ -91,7 +91,7 @@ To import a shapefile we use the `read_sf()` function from **sf**. In our case t
 Otherwise you can load the zipped folder directly from [eppliedEpi repository here](https://github.com/appliedepi/appliedepidata/blob/main/inst/extdata/sle_adm3.zip)
 
 ```{r, echo=F}
-sle_adm3_raw <- sf::read_sf("data/sle_adm3/sle_adm3.shp")
+sle_adm3_raw <- sf::read_sf("data/mapping/sle_adm3/sle_adm3.shp")
 ```
 
 Next we use `clean_names()` from the **janitor** package to standardize the column names of the shapefile. We also use `filter()` to keep only the rows with admin2name of "Western Area Urban" or "Western Area Rural".    
@@ -120,7 +120,7 @@ Next we want to load in some population data - once again this is already availa
 
 ```{r}
 # Population by ADM3
-sle_adm3_pop <- import("data/sle_admpop_adm3_2020.csv") %>%
+sle_adm3_pop <- import("data/mapping/sle_admpop_adm3_2020.csv") %>%
   janitor::clean_names()
 ```
 
@@ -144,7 +144,7 @@ We import the facility points shapefile with `read_sf()`, again clean the column
 
 ```{r}
 # OSM health facility shapefile
-sle_hf <- sf::read_sf("data/sle_adm3/sle_hf.shp") %>% 
+sle_hf <- sf::read_sf("data/mapping/sle_adm3/sle_hf.shp") %>% 
   janitor::clean_names() %>%
   filter(amenity %in% c("hospital", "clinic", "doctors"))
 ```

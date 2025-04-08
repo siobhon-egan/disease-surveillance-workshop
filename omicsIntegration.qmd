@@ -1,0 +1,428 @@
+---
+title: "Omics Integration"
+editor: visual
+---
+
+## Overview {}
+
+> What is -omics? A definition from [Krassowski et al. 2020](https://doi.org/10.3389/fgene.2020.610798) "Multi-omics, variously called integrated omics, pan-omics, and trans-omics, aims to combine two or more omics data sets to aid in data analysis, visualization and interpretation to determine the mechanism of a biological process."
+
+[The wikipedia exert on "Omics"](https://en.wikipedia.org/wiki/Omics)
+"The branches of science known informally as omics are various disciplines in biology whose names end in the suffix -omics, such as genomics, proteomics, metabolomics, metagenomics, phenomics and transcriptomics. Omics aims at the collective characterization and quantification of pools of biological molecules that translate into the structure, function, and dynamics of an organism or organisms.
+The related suffix -ome is used to address the objects of study of such fields, such as the genome, proteome or metabolome respectively. The suffix -ome as used in molecular biology refers to a totality of some sort.
+Functional genomics aims at identifying the functions of as many genes as possible of a given organism. It combines different -omics techniques such as transcriptomics and proteomics with saturated mutant collections."
+
+**Types of 'omic data maybe include**:
+
+-   Culturomics
+-   Epigenomics
+-   Genomics
+-   Glycomics
+-   Lipidomics
+-   Metabolomics
+-   Proteomics
+-   Transcriptomics
+
+**Benefits of multi-omics data**
+
+-   Compensate for missing or unreliable information in any single data type
+-   The likelihood of false positive discoveries are reduced
+-   Better understanding of the complete biological model when considering different layers of interactions
+
+::: {.callout-note icon="false"}
+## Context
+
+Integration of omics data can include transcriptomics, proteomics, lipidomics, microbiome, metagenomics, metabolomics and beyond. This tutorial is to provide an overview of the how data can be "put back together" for integration, biomarker discovery, and data visualisation. Often what follows is a suite of advanced multivariate methods to reduce data dimensionality and uncover relationships within and across datasets.
+
+After this lesson you will be familiar with the type of "clean" data sets that we end up with after these complex experiments and how this type of data might be stored for repeated analysis.
+:::
+
+<!-- ======================================================= -->
+
+
+## Preparation
+
+### Load packages {.unnumbered}
+
+Load packages is using the `p_load` command
+
+```{r, phylogenetic_trees_loading_packages}
+pacman::p_load(
+  ggfortify,         
+  tidyverse,
+  data.table)
+```
+
+### Load in cleaned data sets {.unnumbered}
+
+For this workshop we will be using a published data set that includes NMR and microbiomic information. West KA, Kanu C, Maric T, et al. Longitudinal metabolic and gut bacterial profiling of pregnant women with previous bariatric surgery. Gut 2020;69:1452-1459. doi: [10.1136/gutjnl-2019-319620](http://dx.doi.org/10.1136/gutjnl-2019-319620).
+
+*Context of study:* "Due to the global increase in obesity rates and success of bariatric surgery in weight reduction, an increasing number of women now present pregnant with a previous bariatric procedure. This study investigates the extent of bariatric-associated metabolic and gut microbial alterations during pregnancy and their impact on fetal development."
+
+While this dataset is not *infectious disease* specific is provides a good introduction of managing data from different technologies. The data has been reduced to keep it simple and manageable. Each data set metabolomics and microbiome has been pre-processed Data is available in the directory **data/omicsIntegration**
+
+```{r metatab, message=FALSE}
+metadata <- read_csv("data/omicsIntegration/metadata.csv")
+metadata <- metadata[,-1]
+```
+
+```{r, message=FALSE, echo=F}
+# display the linelist data as a table
+DT::datatable(head(metadata, 50), rownames = FALSE, filter="top", options = list(pageLength = 5, scrollX=T), class = 'white-space: nowrap' )
+```
+
+```{r integralstab, message=FALSE}
+integrals <- read_csv("data/omicsIntegration/integrals.csv")
+integrals <- integrals[,-1]
+```
+
+```{r, message=FALSE, echo=F}
+# display the linelist data as a table
+DT::datatable(head(integrals, 50), rownames = FALSE, filter="top", options = list(pageLength = 5, scrollX=T), class = 'white-space: nowrap' )
+```
+
+```{r genusotus, message=FALSE}
+genera_count <- read_csv("data/omicsIntegration/genera_count.csv")
+genera_count <- genera_count[,-1]
+```
+
+```{r, message=FALSE, echo=F}
+# display the linelist data as a table
+DT::datatable(head(genera_count, 50), rownames = FALSE, filter="top", options = list(pageLength = 5, scrollX=T), class = 'white-space: nowrap' )
+```
+
+### Data clean up {.unnumbered}
+
+We need to make sure that all data frames are in the same order and match sample IDs
+
+```{r}
+idx<-match(metadata$Sample_ID,integrals$Sample_ID)
+integrals <- integrals[idx,]
+idx<-match(metadata$Sample_ID,genera_count$Sample_ID)
+genera_count <- genera_count[idx,]
+```
+
+Check column names of each of the data
+
+```{r}
+colnames(metadata)
+colnames(integrals)
+colnames(genera_count)
+```
+
+We might want to rename the metabolite data to something we can make sense of
+
+```{r}
+colnames(integrals) <-
+  c(
+    "Sample_ID",
+    "phenylacetylglutamine",
+    "p-cresol sulfate",
+    "indoxyl sulfate",
+    "p-hydroxyphenylacetate",
+    "unkn",
+    "creatinine",
+    "alpha-ketoisovalerate",
+    "methylmalonate",
+    "valine",
+    "isoleucine",
+    "leucine",
+    "isobutyrate",
+    "glutamine",
+    "beta-hydroxybutyrate",
+    "GlycA"
+  )
+```
+
+Remove the first column and make sample names as row labels
+
+```{r}
+genera_df <- column_to_rownames(genera_count,
+                                var = "Sample_ID")
+integrals_df <- column_to_rownames(integrals,
+                                var = "Sample_ID")
+```
+
+Check for NAs and replace with 0 if needed
+
+```{r}
+sum(is.na(genera_df))
+sum(is.na(integrals_df))
+integrals_df <- replace(integrals_df,is.na(integrals_df),0)
+```
+
+<!-- ======================================================= -->
+
+## Inspect some trends in the study metadata
+
+Let us take age as first example. Do we see an even distribution among ages?
+
+```{r, fig.height=3,fig.width=5}
+p <- ggplot(metadata, aes(x = Age)) +
+  geom_histogram(color = "black", fill = "white")
+p
+```
+
+What about if we compare age between the two major groups that this paper investigated:
+
+-   NBS - no bariatric surgery
+-   MAL - a form of bariatric surgery known as malabsorptive/mixed (MAL) type
+
+```{r, fig.height=6,fig.width=5}
+p <- ggplot(metadata, aes(x = Age)) +
+  geom_histogram(color = "black", fill = "white")
+p + facet_wrap(~Group_label, nrow = 2, ncol =1)
+```
+
+```{r}
+ggplot(metadata, aes(x = `Fast Maternal Gluc (mmol/L)`)) +
+  geom_histogram(color = "black", fill = "white") + facet_wrap(~ Group_label)
+
+ggplot(metadata, aes(x = `Fast Maternal Insulin (microU/ml)`)) +
+  geom_histogram(color = "black", fill = "white") + facet_wrap(~ Group_label)
+
+ggplot(metadata, aes(x = `BMI`)) +
+  geom_histogram(color = "black", fill = "white") + facet_wrap(~ Group_label)
+
+ggplot(metadata, aes(x = GA..days.)) +
+  geom_histogram(color = "black", fill = "white") + facet_wrap(~ Group_label)
+```
+
+<!-- ======================================================= -->
+
+## Identifying trends
+
+**Merge into wide data frame**
+
+We can merge our three curated data.frames into one big one.
+
+This is helpful for subsetting of certain values and we can transform how we like.
+
+```{r}
+# first we do metadata and NMR
+merged <- metadata %>% full_join(integrals,
+                               by = "Sample_ID")
+# then we add in genera count data
+merged <- merged %>% full_join(genera_count,
+                           by = "Sample_ID")
+```
+
+### Univariant analysis {.unnumbered}
+
+We can now quickly get an overview from which ever aspect we like and manipulate figures by different groups.
+
+Example with Fast Maternal Gluc (mmol/L)
+
+```{r}
+# create violin plot
+p <- merged %>%
+  subset(!is.na(`Fast Maternal Gluc (mmol/L)`))%>%
+  ggplot( aes(x=Obesity, y=`Fast Maternal Gluc (mmol/L)`, fill=Obesity)) +
+    geom_violin()  +
+    theme_bw() +
+    theme(
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Violin chart") +
+    ylab("Fast Maternal Gluc (mmol/L)")
+p + ggpubr::stat_compare_means()
+```
+
+Example with GlycA
+
+```{r}
+# create violin plot
+p <- merged %>%
+  ggplot( aes(x=Obesity, y=GlycA, fill=Obesity)) +
+    geom_violin() +
+    theme_bw() +
+    theme(
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Violin chart") +
+    ylab("GlycA (mmol/L)")
+p + ggpubr::stat_compare_means()
+```
+
+**Now make into long data frame**
+
+We can also format data into long dataframe, this is sometimes needed as input for analysis and figures.
+
+```{r}
+merged_long <- merged %>%
+  pivot_longer(cols=26:length(merged),
+               names_to = "Marker",
+               values_to = "value")
+```
+
+**Subsetting participants**
+
+Keep only those participants which had more than one time point
+
+```{r}
+merged_timereps <-setDT(merged)[, .SD[.N > 1], by = Study.no]
+
+merged_timereps_long <- merged_timereps %>%
+  pivot_longer(cols=26:length(merged),
+               names_to = "Marker",
+               values_to = "value")
+```
+
+We can see how they responded over time to the data point collected
+
+```{r}
+merged_timereps$Study.no <- as.character(merged_timereps$Study.no)
+q1 <-
+  ggplot(data = merged_timereps,
+         aes(
+           x = Time_point,
+           y = glutamine,
+           color = Group_label,
+           group = Study.no
+         )) +
+  geom_line(aes(linetype = Group_label, color = Study.no)) +
+  geom_point(aes(color = Study.no)) +
+  theme_bw()
+q1
+```
+
+```{r}
+merged_timereps$Study.no <- as.character(merged_timereps$Study.no)
+q1 <-
+  ggplot(data = merged_timereps,
+         aes(
+           x = Time_point,
+           y = `p-hydroxyphenylacetate`,
+           color = Group_label,
+           group = Study.no
+         )) +
+  geom_line(aes(linetype = Group_label, color = Study.no)) +
+  geom_point(aes(color = Study.no)) +
+  theme_bw()
+q1
+```
+
+### Multivariant analysis {.unnumbered}
+
+Principal Component Analysis (PCA) is a statistical technique used to reduce the dimensionality of data by identifying the principal components, which are linear combinations of the original variables that capture the most variance.
+
+Spectral decomposition which examines the covariances / correlations between variables
+
+```{r}
+# make character
+merged$Study.no <- as.character(merged$Study.no)
+```
+
+First let's check the NMR data
+
+```{r}
+df <- merged[,28:40]
+df <- replace(df,is.na(df),0)
+pca_res <- prcomp(df, scale. = TRUE)
+
+autoplot(pca_res)
+```
+
+We can also add in the loading - or what is driving the difference between the samples.
+
+```{r}
+autoplot(pca_res, data = merged, colour = 'Group_label', loadings.label = TRUE, loadings.label.size = 3)
+```
+
+Now what about microbiome data
+
+```{r}
+df <- merged[,41:166]
+df <- replace(df,is.na(df),0)
+pca_res <- prcomp(df, scale. = TRUE)
+
+autoplot(pca_res)
+autoplot(pca_res, data = merged, colour = 'Group_label', label = TRUE,frame = TRUE)
+```
+
+We can also add in the loading for bacteria data (but not as easy to read this way)
+
+```{r}
+autoplot(pca_res, data = merged, colour = 'Group_label', label = TRUE,frame = TRUE,  loadings.label = TRUE, loadings.label.size = 3)
+```
+
+### Correlation between metabolites and bacteria {.unnumbered}
+
+Compare data frames of metabolites and microbiome
+
+```{r}
+# Define data sets to cross-correlate
+x <- log10(genera_df)
+y <- log10(integrals_df)
+
+# Cross correlate data sets
+correlations <- microbiome::associate(x, y, method = "spearman", mode = "matrix", 
+                          p.adj.threshold = 0.05, n.signif = 1)
+
+# Or, alternatively, the same output is also available in a handy table format
+correlation.table <- microbiome::associate(x, y, method = "spearman", mode = "table", p.adj.threshold = 0.05, n.signif = 1)
+```
+
+View the significant correlations
+
+```{r, message=FALSE, echo=F}
+# display the linelist data as a table
+DT::datatable(head(correlation.table), rownames = FALSE, filter="top", options = list(pageLength = 15, scrollX=T), class = 'white-space: nowrap' )
+```
+
+```{r}
+p <- microbiome::heat(correlation.table, "X1", "X2", 
+          fill = "Correlation", 
+          star = "p.adj", 
+          p.adj.threshold = 0.05) 
+p + theme(text=element_text(size=10), 
+          axis.text.x = element_text(angle = 90, hjust = 1), 
+          legend.key.size = unit(1.3, "cm"))
+```
+
+```{r}
+# Order the rows and columns with levels argument if needed:
+correlation.table$X1 <-
+  factor(correlation.table$X1, levels = unique(as.character(correlation.table$X1)))
+correlation.table$X2 <-
+  factor(correlation.table$X2, levels = unique(as.character(correlation.table$X2)))
+
+subtable <- filter(correlation.table, p.adj < 0.05)
+
+# Arrange the figure
+p <- ggplot(subtable, aes(x = X1, y = X2, fill = Correlation))
+p <- p + geom_tile() 
+p <- p + scale_fill_gradientn("Correlation", 
+                       breaks = seq(from = -1, to = 1, by = 0.2), 
+                   colours = c("darkblue", "blue", "white", "red", "darkred"), 
+                   limits = c(-1,1)) 
+
+# Polish texts
+p <- p + theme(axis.text.x=element_text(angle = 90, hjust=1, face = "italic"),
+               axis.text.y=element_text(size = 8))
+p <- p + xlab("") + ylab("")
+
+# Mark the most significant cells with stars
+p <- p + geom_text(data = subset(correlation.table, p.adj < 0.02), 
+               aes(x = X1, y = X2, label = "+"), col = "white", size = 5)
+
+# Plot
+print(p)
+```
+
+<!-- ======================================================= -->
+
+
+## Resources {.unnumbered}
+
+Further reading and information
+
+-   *Reading*
+    -   Subramanian I, Verma S, Kumar S, Jere A, Anamika K. Multi-omics Data Integration, Interpretation, and Its Application. Bioinform Biol Insights. 2020;14:1177932219899051. doi: [10.1177/1177932219899051](https://doi.org/10.1177/1177932219899051).
+    -   Santiago-Rodriguez TM, Hollister EB. Multi 'omic data integration: A review of concepts, considerations, and approaches. Semin Perinatol. 2021;45(6):151456. doi: [10.1016/j.semperi.2021.151456](https://doi.org/10.1016/j.semperi.2021.151456).
+    -   Graw S, Chappell K, Washam CL, Gies A, Bird J, Robeson MS 2nd, Byrum SD. Multi-omics data integration considerations and study design for biological systems and disease. Mol Omics. 2021;17(2):170-185. doi: [10.1039/d0mo00041h](https://doi.org/10.1039/d0mo00041h)
+    -   Krassowski M, Das V, Sahu SK, Misra BB. State of the Field in Multi-Omics Research: From Computational Needs to Data Mining and Sharing. Front Genet. 2020;11:610798. doi: [10.3389/fgene.2020.610798](https://doi.org/10.3389/fgene.2020.610798).
+-   *Online courses/material by EMBL-EBI*
+    -   [Introduction to multiomics data integration and visualisation](https://www.ebi.ac.uk/training/events/introduction-multiomics-data-integration-and-visualisation-virtual/)
+    -   [Introduction to multiomics data integration](https://www.ebi.ac.uk/training/events/introduction-multiomics-data-integration/)
+    -   [Systems biology: From large datasets to biological insight](https://www.ebi.ac.uk/training/events/systems-biology-large-datasets-biological-insight-0/)

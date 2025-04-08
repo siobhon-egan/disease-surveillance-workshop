@@ -11,14 +11,15 @@ book:
     - part: "Introduction"
       chapters:
         - whyRandRStudio.qmd
-    - part: "Working with multiple datasets"
-      chapters:
         - merging-data-introduction.qmd
-        - merging-data-application.qmd
     - part: "Mapping"
       chapters:
         - mapping-introduction.qmd
         - mapping-application.qmd
+    - part: "Data Integration & Visualization"
+      chapters:
+        - phylogenetics.qmd
+        - omicsIntegration.qmd
     - part: "Resources"
       chapters:
         - resources.qmd
