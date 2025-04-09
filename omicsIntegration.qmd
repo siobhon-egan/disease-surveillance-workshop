@@ -3,14 +3,11 @@ title: "Omics Integration"
 editor: visual
 ---
 
-## Overview {}
+## Overview
 
 > What is -omics? A definition from [Krassowski et al. 2020](https://doi.org/10.3389/fgene.2020.610798) "Multi-omics, variously called integrated omics, pan-omics, and trans-omics, aims to combine two or more omics data sets to aid in data analysis, visualization and interpretation to determine the mechanism of a biological process."
 
-[The wikipedia exert on "Omics"](https://en.wikipedia.org/wiki/Omics)
-"The branches of science known informally as omics are various disciplines in biology whose names end in the suffix -omics, such as genomics, proteomics, metabolomics, metagenomics, phenomics and transcriptomics. Omics aims at the collective characterization and quantification of pools of biological molecules that translate into the structure, function, and dynamics of an organism or organisms.
-The related suffix -ome is used to address the objects of study of such fields, such as the genome, proteome or metabolome respectively. The suffix -ome as used in molecular biology refers to a totality of some sort.
-Functional genomics aims at identifying the functions of as many genes as possible of a given organism. It combines different -omics techniques such as transcriptomics and proteomics with saturated mutant collections."
+[The wikipedia exert on "Omics"](https://en.wikipedia.org/wiki/Omics) "The branches of science known informally as omics are various disciplines in biology whose names end in the suffix -omics, such as genomics, proteomics, metabolomics, metagenomics, phenomics and transcriptomics. Omics aims at the collective characterization and quantification of pools of biological molecules that translate into the structure, function, and dynamics of an organism or organisms. The related suffix -ome is used to address the objects of study of such fields, such as the genome, proteome or metabolome respectively. The suffix -ome as used in molecular biology refers to a totality of some sort. Functional genomics aims at identifying the functions of as many genes as possible of a given organism. It combines different -omics techniques such as transcriptomics and proteomics with saturated mutant collections."
 
 **Types of 'omic data maybe include**:
 
@@ -38,7 +35,6 @@ After this lesson you will be familiar with the type of "clean" data sets that w
 :::
 
 <!-- ======================================================= -->
-
 
 ## Preparation
 
@@ -155,7 +151,20 @@ integrals_df <- replace(integrals_df,is.na(integrals_df),0)
 
 ## Inspect some trends in the study metadata
 
-Let us take age as first example. Do we see an even distribution among ages?
+It is important to first inspect the study demographic or metadata.
+
+When attempting to assign correlation or association it is important to first establish if there are any underlying bias in our data.
+
+::: callout-tip
+
+### Checking the study design was robust 
+
+In theory a well designed study should mean there are no other co-founding factors in the groups. But that assumes the study was representative in the first place and that all assumptions of the study were meant - this can easier said than done. So it is important on the data side to get that the initial study assumptions have been met.
+
+::: 
+
+
+Do we see an even distribution among ages?
 
 ```{r, fig.height=3,fig.width=5}
 p <- ggplot(metadata, aes(x = Age)) +
@@ -209,9 +218,13 @@ merged <- merged %>% full_join(genera_count,
 
 ### Univariant analysis {.unnumbered}
 
-We can now quickly get an overview from which ever aspect we like and manipulate figures by different groups.
+We may want to get a overview of a single measure to identify trends among the study groups.
 
-Example with Fast Maternal Gluc (mmol/L)
+We can do this with univariant analysis.
+
+First we plot the Fast Maternal Gluc (mmol/L) using a Violin plot - this is a variation of a simple boxplot but includes information about the distribution of the data.
+
+We can also include a statistical compariation among the groups
 
 ```{r}
 # create violin plot
@@ -227,6 +240,8 @@ p <- merged %>%
     ylab("Fast Maternal Gluc (mmol/L)")
 p + ggpubr::stat_compare_means()
 ```
+
+**Conclusion:** No 
 
 Example with GlycA
 
@@ -411,7 +426,6 @@ print(p)
 ```
 
 <!-- ======================================================= -->
-
 
 ## Resources {.unnumbered}
 
