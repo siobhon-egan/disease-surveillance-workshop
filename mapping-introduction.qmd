@@ -41,7 +41,8 @@ pacman::p_load(
   tidyverse,     # to clean, handle, and plot the data (includes ggplot2 package)
   OpenStreetMap, # to add OSM basemap in ggplot map
   sf,            # to manage spatial data using a Simple Feature format
-  tmap          # to produce simple maps, works for both interactive and static maps
+  tmap,          # to produce simple maps, works for both interactive and static maps
+  janitor
   )
 ```
 

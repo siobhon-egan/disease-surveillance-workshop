@@ -156,13 +156,10 @@ It is important to first inspect the study demographic or metadata.
 When attempting to assign correlation or association it is important to first establish if there are any underlying bias in our data.
 
 ::: callout-tip
-
-### Checking the study design was robust 
+### Checking the study design was robust
 
 In theory a well designed study should mean there are no other co-founding factors in the groups. But that assumes the study was representative in the first place and that all assumptions of the study were meant - this can easier said than done. So it is important on the data side to get that the initial study assumptions have been met.
-
-::: 
-
+:::
 
 Do we see an even distribution among ages?
 
@@ -241,7 +238,7 @@ p <- merged %>%
 p + ggpubr::stat_compare_means()
 ```
 
-**Conclusion:** No 
+**Conclusion:** No
 
 Example with GlycA
 

@@ -2,15 +2,13 @@
 title: "Local examples"
 ---
 
-https://www.geoboundaries.org/
-
 I am assuming you want more mapping after [the first exercise](mapping-introduction.qmd) so lets explore some local examples that you can get started with!
 
 <!-- ======================================================= -->
 
-## Preparation {  }
+## Preparation
 
-### Load packages {.unnumbered} 
+### Load packages {.unnumbered}
 
 Load packages is using the `p_load` command
 
@@ -20,46 +18,51 @@ pacman::p_load(
   tidyverse,     # to clean, handle, and plot the data (includes ggplot2 package)
   OpenStreetMap, # to add OSM basemap in ggplot map
   sf,            # to manage spatial data using a Simple Feature format
-  rear,          # read in csv file
+  readr,          # read in csv file
   tmap          # to produce simple maps, works for both interactive and static maps
   )
 ```
 
 <!-- ======================================================= -->
-## Using OpenStreetMap {  }
+
+## Using OpenStreetMap
 
 [**OpenStreetMap**](https://en.wikipedia.org/wiki/OpenStreetMap) is a collaborative project to create a free editable map of the world. The underlying geolocation data (e.g. locations of cities, roads, natural features, airports, schools, hospitals, roads etc) are considered the primary output of the project.
 
-First we load the **OpenStreetMap** package, from which we will get our basemap.  
+First we load the **OpenStreetMap** package, from which we will get our basemap.
 
-Then, we create the object `map`, which we define using the function `openmap()` from **OpenStreetMap** package ([documentation](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/openmap)). We provide the following:  
+Then, we create the object `map`, which we define using the function `openmap()` from **OpenStreetMap** package ([documentation](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/openmap)). We provide the following:
 
-* `upperLeft` and `lowerRight` Two coordinate pairs specifying the limits of the basemap tile  
-  * In this case you will see we have put in the max and min from the mosquito occurrence dataset we will be using, so the map will respond dynamically to the data  
-* `zoom = ` (if null it is determined automatically)  
-* `type =` which type of basemap - we have listed several possibilities here and the code is currently using the first one (`[1]`) "osm"  
-* `mergeTiles = ` we chose TRUE so the basetiles are all merged into one
+-   `upperLeft` and `lowerRight` Two coordinate pairs specifying the limits of the basemap tile
+    -   In this case you will see we have put in the max and min from the mosquito occurrence dataset we will be using, so the map will respond dynamically to the data\
+-   `zoom =` (if null it is determined automatically)\
+-   `type =` which type of basemap - we have listed several possibilities here and the code is currently using the first one (`[1]`) "osm"\
+-   `mergeTiles =` we chose TRUE so the basetiles are all merged into one
 
-::: {.callout-note}
-
-**Mosquito occurrence**
-I searched for and downloaded mosquito occurrence data from the [iNaturalist site](https://www.inaturalist.org/home) - searching for any Culicidae occurrences in Sarawak. You can load it in as the csv file is saved in the **data/mapping/iNat-mosquito-obs** directory
+::: callout-note
+**Mosquito occurrence** I searched for and downloaded mosquito occurrence data from the [iNaturalist site](https://www.inaturalist.org/home) - searching for any Culicidae occurrences in Sarawak. You can load it in as the csv file is saved in the **data/mapping/iNat-mosquito-obs** directory
 :::
 
 ```{r}
 mosqutio <- read_csv("data/mapping/iNat-mosquito-obs/observations-545115.csv")
 ```
+
 This data is loaded directly as it appears from iNaturalist, we can take a look at what it contains first
 
 ```{r, message=FALSE, echo=F}
 # display the linelist data as a table
-DT::datatable(head(mosqutio, 50), rownames = FALSE, filter="top", options = list(pageLength = 15, scrollX=T), class = 'white-space: nowrap' )
+DT::datatable(
+  head(mosqutio, 50),
+  rownames = FALSE,
+  filter = "top",
+  options = list(pageLength = 15, scrollX = T),
+  class = 'white-space: nowrap'
+)
 ```
-
 
 Now we can use the coordinates in the columns labeled `latitude` and `longitude` to set the boundaries for our basemap.
 
-```{r}
+```{r, eval=FALSE}
 # Fit basemap by range of lat/long coordinates. Choose tile type
 map <- OpenStreetMap::openmap(
   upperLeft = c(
@@ -83,36 +86,34 @@ map <- OpenStreetMap::openmap(
 )
 ```
 
-If we plot this basemap right now, using `autoplot.OpenStreetMap()` from **OpenStreetMap** package, you see that the units on the axes are not latitude/longitude coordinates. It is using a different coordinate system. To correctly display the case residences (which are stored in lat/long), this must be changed.  
+If we plot this basemap right now, using `autoplot.OpenStreetMap()` from **OpenStreetMap** package, you see that the units on the axes are not latitude/longitude coordinates. It is using a different coordinate system. To correctly display the case residences (which are stored in lat/long), this must be changed.
 
-
-```{r}
+```{r, eval=FALSE}
 # Plot map. Must use "autoplot" in order to work with ggplot
 autoplot.OpenStreetMap(map)
 ```
 
-Thus, we want to convert the map to latitude/longitude with the `openproj()` function from **OpenStreetMap** package. We provide the basemap `map` and also provide the Coordinate Reference System (CRS) we want. We do this by providing the "proj.4" character string for the WGS 1984 projection, but you can provide the CRS in other ways as well. (see [this page](https://www.earthdatascience.org/courses/earth-analytics/spatial-data-r/understand-epsg-wkt-and-other-crs-definition-file-types/) to better understand what a proj.4 string is)  
+Thus, we want to convert the map to latitude/longitude with the `openproj()` function from **OpenStreetMap** package. We provide the basemap `map` and also provide the Coordinate Reference System (CRS) we want. We do this by providing the "proj.4" character string for the WGS 1984 projection, but you can provide the CRS in other ways as well. (see [this page](https://www.earthdatascience.org/courses/earth-analytics/spatial-data-r/understand-epsg-wkt-and-other-crs-definition-file-types/) to better understand what a proj.4 string is)
 
-```{r}
+```{r, eval=FALSE}
 # Projection WGS84
 map_latlon <- openproj(map, projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 ```
 
-Now when we create the plot we see that along the axes are latitude and longitude coordinate. The coordinate system has been converted. Now our cases will plot correctly if overlaid!  
+Now when we create the plot we see that along the axes are latitude and longitude coordinate. The coordinate system has been converted. Now our cases will plot correctly if overlaid!
 
-```{r}
+```{r, eval=FALSE}
 # Plot map. Must use "autoplot" in order to work with ggplot
 autoplot.OpenStreetMap(map_latlon)
 ```
 
-See the tutorials [here](http://data-analytics.net/cep/Schedule_files/geospatial.html) and [here](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/autoplot.OpenStreetMap) for more info.  
+See the tutorials [here](http://data-analytics.net/cep/Schedule_files/geospatial.html) and [here](https://www.rdocumentation.org/packages/OpenStreetMap/versions/0.3.4/topics/autoplot.OpenStreetMap) for more info.
 
-When we have a basemap with lat/long coordinates, we can plot our cases on top using the lat/long coordinates of their residence. 
+When we have a basemap with lat/long coordinates, we can plot our cases on top using the lat/long coordinates of their residence.
 
-Building on the function `autoplot.OpenStreetMap()` to create the basemap, **ggplot2** functions will easily add on top, as shown with `geom_point()`.
-Now we can start plotting those mosquito occurrence records
+Building on the function `autoplot.OpenStreetMap()` to create the basemap, **ggplot2** functions will easily add on top, as shown with `geom_point()`. Now we can start plotting those mosquito occurrence records
 
-```{r, warning=F, message=F}
+```{r, warning=F, message=F, eval=FALSE}
 # Plot map. Must be autoplotted to work with ggplot
 autoplot.OpenStreetMap(map_latlon) +                 # begin with the basemap
   geom_point(                                       # add xy points from linelist lon and lat columns 
@@ -126,22 +127,21 @@ autoplot.OpenStreetMap(map_latlon) +                 # begin with the basemap
        title = "Mosquito Occurence Data Sarawak")
 ```
 
-### Contoured density heatmaps {.unnumbered} 
+### Contoured density heatmaps {.unnumbered}
 
-For this data set there are not too many occurrences, but in some instances it may be useful to visualize it as a Contoured density heatmaps.
-Remember in our mosquito metadata each row with an observed occurrence. 
+For this data set there are not too many occurrences, but in some instances it may be useful to visualize it as a Contoured density heatmaps. Remember in our mosquito metadata each row with an observed occurrence.
 
 To create a Contoured density heatmap
 
-1. Create basemap tile from OpenStreetMap, as described above
-2. Plot the cases from `mosqutio` using the latitude and longitude columns
-3. Convert the points to a density heatmap with `stat_density_2d()` from **ggplot2**,
+1.  Create basemap tile from OpenStreetMap, as described above
+2.  Plot the cases from `mosqutio` using the latitude and longitude columns
+3.  Convert the points to a density heatmap with `stat_density_2d()` from **ggplot2**,
 
 When we have a basemap with lat/long coordinates, we can plot our cases on top using the lat/long coordinates of their residence.
 
 Building on the function `autoplot.OpenStreetMap()` to create the basemap, **ggplot2** functions will easily add on top, as shown with `geom_point()` below:
 
-```{r}
+```{r, eval=FALSE}
 # begin with the basemap
 autoplot.OpenStreetMap(map_latlon)+
   
@@ -167,11 +167,9 @@ autoplot.OpenStreetMap(map_latlon)+
        title = "Distribution of Mosquito occurrences")
 ```
 
-
-
 <!-- ======================================================= -->
 
-## Using the sf package {  }
+## Using the sf package
 
 To use this package you will need a shape file.
 
@@ -193,8 +191,8 @@ tm_shape(my) +               # admin boundaries shapefile
 
 ```
 
-
 Including an interactive view using `tmap_mode("view")`
+
 ```{r}
 tmap_mode("view")
 tm_shape(my) +               # admin boundaries shapefile
@@ -211,7 +209,7 @@ ggplot(data=my) +
   geom_sf(aes(fill=name))
 ```
 
-### Adding in our records to our tmap {.unnumbered} 
+### Adding in our records to our tmap {.unnumbered}
 
 Covert the `mosquito` dataframe to a sf with function `st_as_sf()` to create the new object we call `mosqutio_sf`. This designated the columns longitude and latitude as coordinate columns, and a coordinate reference system (CRS) has been assigned for when the points are displayed.
 
@@ -235,6 +233,51 @@ tm_shape(mosqutio_sf) +
   tm_layout(title = "Mosquito Occurence Data Sarawak") 
 ```
 
+## Another options with additional boundaries
 
+Lets redo a similar map to the one above but this time we have sourced data from a different repository.
 
+We want to include information at the district level - this might be handy if you later want to be able to be plots about prevalence at that level.
 
+To do this we need a map with this information - lucky the [Department of Statistics Malaysia hosts this on their GitHub](https://github.com/dosm-malaysia).
+
+This time we can call the file directly from the repository (it achieves the same outcome as above but we don't have to rely on a static data file in our local repository!)
+
+```{r}
+tmp_geojson <- tempfile(fileext = ".geojson")
+download.file(
+  "https://raw.githubusercontent.com/dosm-malaysia/data-open/master/datasets/geodata/administrative_2_district.geojson",
+  tmp_geojson
+)
+my_district <- read_sf(tmp_geojson)
+```
+
+We can use tmap to make a simple country map
+
+```{r}
+sf_use_s2(FALSE)
+tmap_mode("plot")
+tm_shape(my_district) +               # admin boundaries shapefile
+  tm_polygons(col = "#F7F7F7")+    # show polygons in light grey
+  tm_borders(col = "#000000",      # show borders with color and line weight
+             lwd = 2) 
+```
+
+And again with the interactive view using `tmap_mode("view")`
+
+```{r}
+tmap_mode("view")
+tm_shape(my_district) +               # admin boundaries shapefile
+  tm_polygons(col = "#F7F7F7")+    # show polygons in light grey
+  tm_borders(col = "#000000",      # show borders with color and line weight
+             lwd = 2)
+```
+
+Using **ggplot2** we can easily code each district by state.
+
+```{r}
+ggplot(data=my_district) + 
+  geom_sf(aes(fill=state))
+```
+
+<!-- https://www.geoboundaries.org/ -->

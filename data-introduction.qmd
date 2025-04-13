@@ -439,6 +439,11 @@ linelist_mini %>%
 
 To see the `hosp_info` records that were excluded in the inner join, we could also run an anti-join with `hosp_info` as the baseline data frame.
 
+
+### Long vs wide data {.unnumbered}
+
+
+
 <!-- ======================================================= -->
 
 ## Probabalistic matching
